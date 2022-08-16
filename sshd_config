@@ -1,0 +1,7 @@
+X11Forwarding no
+PrintMotd no
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+UsePAM no
+PermitRootLogin no
+AcceptEnv LANG LC_*
