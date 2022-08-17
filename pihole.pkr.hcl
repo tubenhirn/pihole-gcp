@@ -20,10 +20,10 @@ variable "ipv4_address" {
   type = string
 }
 
-variable "pi_password" {
-  type      = string
-  sensitive = true
-}
+# variable "pi_password" {
+#   type      = string
+#   sensitive = true
+# }
 
 variable "pihole_web_password" {
   type      = string
@@ -73,10 +73,10 @@ build {
     execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
   }
 
-  provisioner "shell" {
-    inline          = ["if [ ! -z '${var.pi_password}' ]; then", "  echo 'pi:${var.pi_password}' | chpasswd", "fi", "echo 'pi ALL=(ALL) PASSWD: ALL' | tee /etc/sudoers.d/010_pi-passwd"]
-    execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
-  }
+  # provisioner "shell" {
+  #   inline          = ["if [ ! -z '${var.pi_password}' ]; then", "  echo 'pi:${var.pi_password}' | chpasswd", "fi", "echo 'pi ALL=(ALL) PASSWD: ALL' | tee /etc/sudoers.d/010_pi-passwd"]
+  #   execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
+  # }
 
   provisioner "file" {
     destination = "/tmp/setupVars.conf"
