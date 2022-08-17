@@ -4,6 +4,7 @@ import (
 	"dagger.io/dagger"
 	"dagger.io/dagger/core"
 
+	"universe.dagger.io/docker"
 	"universe.dagger.io/x/ezequiel@foncubierta.com/terraform"
 )
 
@@ -15,6 +16,47 @@ dagger.#Plan & {
 	}
 
 	actions: {
+		"build": {
+			version: *"latest" | string
+			_source: client.filesystem["."].read.contents
+
+			_image: docker.#Pull & {
+				source:      "hashicorp/packer:\(version)"
+				resolveMode: "preferLocal"
+			}
+
+			init: docker.#Run & {
+				input: _image.output
+				mounts: code: {
+					dest:     "/src"
+					contents: _source
+				}
+				workdir: "/src"
+				command: {
+					name: "init"
+					args: ["pihole.pkr.hcl"]
+				}
+				env: {
+					LOG_LEVEL: "debug"
+				}
+			}
+
+			build: docker.#Run & {
+				input: init.output
+				mounts: code: {
+					dest:     "/src"
+					contents: _source
+				}
+				workdir: "/src"
+				command: {
+					name: "build"
+					args: ["pihole.pkr.hcl"]
+				}
+				env: {
+					LOG_LEVEL: "debug"
+				}
+			}
+		}
 		"deploy": {
 			_tfenv: {
 				TF_VAR_credentials: client.env.CREDENTIALS
