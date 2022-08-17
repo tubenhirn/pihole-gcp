@@ -11,14 +11,14 @@ dagger.#Plan & {
 	client: filesystem: ".": read: contents: dagger.#FS
 	client: env: {
 		CREDENTIALS: dagger.#Secret
-		PROJECT: string
+		PROJECT:     string
 	}
 
 	actions: {
 		"deploy": {
 			_tfenv: {
 				TF_VAR_credentials: client.env.CREDENTIALS
-				TF_VAR_project: client.env.PROJECT
+				TF_VAR_project:     client.env.PROJECT
 			}
 			_tfSource: core.#Source & {
 				path: "./terraform"
@@ -37,6 +37,11 @@ dagger.#Plan & {
 			apply: terraform.#Apply & {
 				source: plan.output
 				env:    _tfenv
+			}
+			output: terraform.#Run & {
+				source: apply.output
+				cmd:    "output"
+				cmdArgs: ["-json"]
 			}
 		}
 	}
