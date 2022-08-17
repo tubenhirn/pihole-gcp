@@ -58,8 +58,10 @@ variable "user_public_key" {
 source "googlecompute" "pihole" {
   project_id = var.project
   source_image = "debian-9-stretch-v20200805"
-  ssh_username = "packer"
+  ssh_username = var.user_name
   zone = "us-east1-c"
+  machine_type = ""
+  disk_size = ""
 }
 
 build {
