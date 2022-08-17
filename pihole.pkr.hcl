@@ -61,7 +61,7 @@ source "googlecompute" "pihole" {
   ssh_username = var.user_name
   zone = "us-east1-c"
   machine_type = "f1-micro"
-  disk_size = "30GB"
+  disk_size = 30
 }
 
 build {
