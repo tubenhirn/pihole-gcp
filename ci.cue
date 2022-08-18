@@ -80,11 +80,6 @@ dagger.#Plan & {
 				source: plan.output
 				env:    _tfenv
 			}
-			output: terraform.#Run & {
-				source: apply.output
-				cmd:    "output"
-				cmdArgs: ["-json"]
-			}
 		}
 	}
 }
