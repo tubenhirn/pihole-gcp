@@ -62,6 +62,7 @@ build {
   provisioner "shell" {
     inline = ["echo '${var.ipv4_address}'"]
   }
+
   provisioner "shell" {
     inline          = ["apt-get update", "apt-get upgrade -y", "touch /boot/ssh", "echo '${var.host_name}' | tee /etc/hostname", "mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig"]
     execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
@@ -89,6 +90,11 @@ build {
 
   provisioner "shell" {
     inline          = ["WEBPASSWORD=$(echo -n '${var.pihole_web_password}' | sha256sum | awk '{printf \"%s\",$1 }' | sha256sum | awk '{printf \"%s\",$1}')", "echo \"WEBPASSWORD=$${WEBPASSWORD}\" | tee -a /etc/pihole/setupVars.conf", "echo 'IPV4_ADDRESS=${var.ipv4_address}' | tee -a /etc/pihole/setupVars.conf", "curl -L https://install.pi-hole.net | bash /dev/stdin --unattended"]
+    execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
+  }
+
+  provisioner "shell" {
+    inline = ["hostnamectl set-hostname pihole"]
     execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
   }
 

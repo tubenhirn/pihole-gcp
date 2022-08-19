@@ -16,51 +16,10 @@ dagger.#Plan & {
 		PKR_ACCESS_TOKEN:            dagger.#Secret
 		PKR_USER_NAME:               dagger.#Secret
 		PKR_USER_PASSWORD:           dagger.#Secret
-		PKR_PKR_PIHOLE_WEB_PASSWORD: dagger.#Secret
+		PKR_PIHOLE_WEB_PASSWORD: dagger.#Secret
 	}
 
 	actions: {
-		"build": {
-			version: *"latest" | string
-			_source: client.filesystem["."].read.contents
-
-			_image: docker.#Pull & {
-				source:      "hashicorp/packer:\(version)"
-				resolveMode: "preferLocal"
-			}
-
-			init: docker.#Run & {
-				input: _image.output
-				mounts: code: {
-					dest:     "/src"
-					contents: _source
-				}
-				workdir: "/src"
-				command: {
-					name: "init"
-					args: ["pihole.pkr.hcl"]
-				}
-				env: {
-					LOG_LEVEL: "debug"
-				}
-			}
-
-			build: docker.#Run & {
-				input: init.output
-				mounts: code: {
-					dest:     "/src"
-					contents: _source
-				}
-				workdir: "/src"
-				command: {
-					name: "build"
-					args: ["pihole.pkr.hcl"]
-				}
-				env: {
-					LOG_LEVEL: "debug"
-				}
-			}
-		}
 		"deploy": {
 			_tfenv: {
 				TF_VAR_credentials: client.env.TF_CREDENTIALS
