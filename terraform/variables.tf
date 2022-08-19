@@ -11,3 +11,13 @@ variable "credentials" {
   type      = string
   sensitive = true
 }
+
+variable "image" {
+  type = string
+  default = ""
+}
+
+variable "ipv4_address" {
+  type = string
+  default = ""
+}

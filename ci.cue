@@ -11,11 +11,11 @@ import (
 dagger.#Plan & {
 	client: filesystem: ".": read: contents: dagger.#FS
 	client: env: {
-		PROJECT:                     string
-		TF_CREDENTIALS:              dagger.#Secret
-		PKR_ACCESS_TOKEN:            dagger.#Secret
-		PKR_USER_NAME:               dagger.#Secret
-		PKR_USER_PASSWORD:           dagger.#Secret
+		PROJECT:                 string
+		TF_CREDENTIALS:          dagger.#Secret
+		PKR_ACCESS_TOKEN:        dagger.#Secret
+		PKR_USER_NAME:           dagger.#Secret
+		PKR_USER_PASSWORD:       dagger.#Secret
 		PKR_PIHOLE_WEB_PASSWORD: dagger.#Secret
 	}
 
@@ -41,6 +41,7 @@ dagger.#Plan & {
 			init: terraform.#Init & {
 				source: _tfSource.output
 			}
+
 			validate: terraform.#Validate & {
 				source: init.output
 			}
@@ -50,6 +51,7 @@ dagger.#Plan & {
 				cmdArgs: ["--var-file=prod.tfvars", "--target=google_compute_address.ip_address", "--target=local_file.ip_address_output"]
 				env: _tfenv
 			}
+
 			applyNetwork: terraform.#Apply & {
 				source: planNetwork.output
 				env:    _tfenv
@@ -70,6 +72,7 @@ dagger.#Plan & {
 					LOG_LEVEL: "debug"
 				}
 			}
+
 			packerBuild: docker.#Run & {
 				input:         packerInit.output
 				_ipv4_address: core.#ReadFile & {
@@ -95,6 +98,30 @@ dagger.#Plan & {
 					PKR_VAR_ipv4_address:        _ipv4_address.contents
 				}
 			}
+
+			planInstance: terraform.#Plan & {
+				source:        validate.output
+				_ipv4_address: core.#ReadFile & {
+					input: applyNetwork.output
+					path:  "./ip_address.txt"
+				}
+				_imageName: core.#ReadFile & {
+					input: packerBuild.output.rootfs
+					path: "./image.txt"
+				}
+				cmdArgs: ["--var-file=prod.tfvars", "--target=google_compute_instance.pihole"]
+				env: {
+					TF_VAR_credentials:  client.env.TF_CREDENTIALS
+					TF_VAR_project:      client.env.PROJECT
+					TF_VAR_image:        _imageName.contents
+					TF_VAR_ipv4_address: _ipv4_address.contents
+				}
+			}
+
+			applyInstance: terraform.#Apply & {
+				source: planInstance.output
+			}
+
 		}
 	}
 }

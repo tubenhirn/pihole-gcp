@@ -1,7 +1,7 @@
 packer {
   required_plugins {
     googlecompute = {
-      version = ">= 0.0.1"
+      version = "= 1.0.14"
       source  = "github.com/hashicorp/googlecompute"
     }
   }
@@ -63,14 +63,14 @@ build {
     inline = ["echo '${var.ipv4_address}'"]
   }
 
-  provisioner "shell" {
-    inline          = ["apt-get update", "apt-get upgrade -y", "touch /boot/ssh", "echo '${var.host_name}' | tee /etc/hostname", "mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig"]
-    execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
-  }
+  # provisioner "shell" {
+  #   inline          = ["apt-get update", "apt-get upgrade -y", "touch /boot/ssh", "echo '${var.host_name}' | tee /etc/hostname", "mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig"]
+  #   execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
+  # }
 
   provisioner "file" {
     destination = "/tmp/sshd_config"
-    source      = "sshd_config"
+    source      = "files/tmp/sshd_config"
   }
 
   provisioner "shell" {
@@ -80,7 +80,7 @@ build {
 
   provisioner "file" {
     destination = "/tmp/setupVars.conf"
-    source      = "setupVars.conf"
+    source      = "files/tmp/setupVars.conf"
   }
 
   provisioner "shell" {
@@ -100,11 +100,11 @@ build {
 
   provisioner "file" {
     destination = "/tmp/vpnOptions.conf"
-    source      = "vpnOptions.conf"
+    source      = "files/tmp/vpnOptions.conf"
   }
 
   provisioner "shell" {
-    inline = ["curl -L https://install.pivpn.io > install.sh", "chmod +x install.sh", "./install.sh --unattended /tmp/vpnOptions.conf"]
+    inline = ["mkdir /usr/local/src/pivpn", "curl -L https://install.pivpn.io > install.sh", "chmod +x install.sh", "./install.sh --unattended /tmp/vpnOptions.conf"]
     execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
   }
 }
