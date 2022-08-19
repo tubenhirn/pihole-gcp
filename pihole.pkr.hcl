@@ -7,8 +7,13 @@ packer {
   }
 }
 
-variable "project" {
+variable "pkr_access_token" {
   type      = string
+  sensitive = true
+}
+
+variable "project" {
+  type = string
 }
 
 variable "host_name" {
@@ -31,7 +36,8 @@ variable "pihole_web_password" {
 }
 
 variable "user_name" {
-  type    = string
+  type      = string
+  sensitive = true
 }
 
 variable "user_password" {
@@ -43,6 +49,10 @@ variable "user_password" {
 #   type    = string
 #   default = ""
 # }
+#
+variable "image_version" {
+  type = string
+}
 
 source "googlecompute" "pihole" {
   project_id   = var.project
@@ -52,14 +62,18 @@ source "googlecompute" "pihole" {
   zone         = "us-east1-c"
   machine_type = "f1-micro"
   disk_size    = 30
-  image_name   = "pihole"
+  image_name   = "pihole-${var.image_version}"
+  access_token = var.pkr_access_token
 }
 
 build {
   sources = ["source.googlecompute.pihole"]
 
   provisioner "shell" {
-    inline = ["apt-get update", "apt-get upgrade -y", "touch /boot/ssh", "echo '${var.host_name}' | tee /etc/hostname", "mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig"]
+    inline = ["echo '${var.ipv4_address}'"]
+  }
+  provisioner "shell" {
+    inline          = ["apt-get update", "apt-get upgrade -y", "touch /boot/ssh", "echo '${var.host_name}' | tee /etc/hostname", "mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig"]
     execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
   }
 
