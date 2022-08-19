@@ -12,7 +12,7 @@ dagger.#Plan & {
 	client: filesystem: ".": read: contents: dagger.#FS
 	client: env: {
 		PROJECT:                     string
-		TF_CREDENTIALS:                 dagger.#Secret
+		TF_CREDENTIALS:              dagger.#Secret
 		PKR_ACCESS_TOKEN:            dagger.#Secret
 		PKR_USER_NAME:               dagger.#Secret
 		PKR_USER_PASSWORD:           dagger.#Secret
