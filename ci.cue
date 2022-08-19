@@ -105,10 +105,7 @@ dagger.#Plan & {
 					input: applyNetwork.output
 					path:  "./ip_address.txt"
 				}
-				_imageName: core.#ReadFile & {
-					input: packerBuild.output.rootfs
-					path: "./image.txt"
-				}
+				_imageName: "pihole-draft"
 				cmdArgs: ["--var-file=prod.tfvars", "--target=google_compute_instance.pihole"]
 				env: {
 					TF_VAR_credentials:  client.env.TF_CREDENTIALS
