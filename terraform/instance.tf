@@ -1,6 +1,6 @@
 resource "google_compute_instance" "pihole" {
   name         = "pihole"
-  machine_type = "f2-micro"
+  machine_type = "f1-micro"
   zone         = "us-east1-c"
 
   boot_disk {
@@ -10,6 +10,7 @@ resource "google_compute_instance" "pihole" {
   }
 
   network_interface {
+    network = "default"
     access_config {
       nat_ip = var.ipv4_address
     }
