@@ -86,7 +86,7 @@ dagger.#Plan & {
 				workdir: "/src"
 				command: {
 					name: "build"
-					args: ["pihole.pkr.hcl"]
+					args: ["-force", "pihole.pkr.hcl"]
 				}
 				env: {
 					PKR_VAR_user_name:           client.env.PKR_USER_NAME
@@ -94,7 +94,7 @@ dagger.#Plan & {
 					PKR_VAR_pihole_web_password: client.env.PKR_PIHOLE_WEB_PASSWORD
 					PKR_VAR_project:             client.env.PROJECT
 					PKR_VAR_pkr_access_token:    client.env.PKR_ACCESS_TOKEN
-					PKR_VAR_image_version:       "draft"
+					PKR_VAR_image_version:       "v1"
 					PKR_VAR_ipv4_address:        _ipv4_address.contents
 				}
 			}
@@ -105,12 +105,13 @@ dagger.#Plan & {
 					input: applyNetwork.output
 					path:  "./ip_address.txt"
 				}
-				_imageName: "pihole-draft"
+				_imageName: "pihole-v1"
 				cmdArgs: ["--var-file=prod.tfvars", "--target=google_compute_instance.pihole"]
 				env: {
+					WAIT_FOR_PACKER_BUILD:     "\(packerBuild.success)"
 					TF_VAR_credentials:  client.env.TF_CREDENTIALS
 					TF_VAR_project:      client.env.PROJECT
-					TF_VAR_image:        _imageName.contents
+					TF_VAR_image:        _imageName
 					TF_VAR_ipv4_address: _ipv4_address.contents
 				}
 			}

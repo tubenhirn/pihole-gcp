@@ -63,10 +63,10 @@ build {
     inline = ["echo '${var.ipv4_address}'"]
   }
 
-  # provisioner "shell" {
-  #   inline          = ["apt-get update", "apt-get upgrade -y", "touch /boot/ssh", "echo '${var.host_name}' | tee /etc/hostname", "mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig"]
-  #   execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
-  # }
+  provisioner "shell" {
+    inline          = ["apt-get update", "apt-get upgrade -y", "touch /boot/ssh", "echo '${var.host_name}' | tee /etc/hostname", "mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig"]
+    execute_command = "echo '${var.user_password}' | sudo -S env {{ .Vars }} {{ .Path }}"
+  }
 
   provisioner "file" {
     destination = "/tmp/sshd_config"
